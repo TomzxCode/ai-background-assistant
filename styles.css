@@ -436,6 +436,53 @@ button:disabled {
     line-height: 1.4;
 }
 
+.api-key-control {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.api-key-control label {
+    display: block;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.api-key-control input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    transition: border-color 0.2s;
+    font-family: 'Courier New', monospace;
+}
+
+.api-key-control input:hover {
+    border-color: #667eea;
+}
+
+.api-key-control input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.api-key-control input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+
+.api-key-help {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
 .llm-control {
     margin-bottom: 20px;
     padding: 15px;

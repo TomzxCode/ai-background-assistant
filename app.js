@@ -34,6 +34,7 @@ const frequencyInput = document.getElementById('frequencyInput');
 const frequencyError = document.getElementById('frequencyError');
 const directoryBtn = document.getElementById('directoryBtn');
 const directoryPath = document.getElementById('directoryPath');
+const apiKeyInput = document.getElementById('apiKeyInput');
 const enableLLMCheckbox = document.getElementById('enableLLM');
 const promptInput = document.getElementById('promptInput');
 
@@ -50,11 +51,23 @@ function loadSettings() {
     if (savedPrompt) {
         promptInput.value = savedPrompt;
     }
+
+    const savedApiKey = localStorage.getItem('LLM_API_KEY');
+    if (savedApiKey) {
+        apiKeyInput.value = savedApiKey;
+    }
 }
 
 // Save settings to localStorage
 function saveSettings() {
     localStorage.setItem('analysisPrompt', promptInput.value);
+
+    // Save API key and update llmOptions
+    const apiKey = apiKeyInput.value.trim();
+    if (apiKey) {
+        localStorage.setItem('LLM_API_KEY', apiKey);
+        llmOptions.apiKey = apiKey;
+    }
 }
 
 function updateStatus(message, isError = false) {
