@@ -11,22 +11,11 @@
         <h1>AI Background Assistant</h1>
         <p>Start screen capture to monitor your activity. Frames will be captured at your configured interval for AI analysis.</p>
 
-        <div class="frequency-control">
-            <label for="frequencyInput">Capture Frequency:</label>
-            <input
-                type="text"
-                id="frequencyInput"
-                placeholder="e.g., 1m, 30s, 1h30m, 2d12h"
-                value="1m"
-            >
-            <div class="frequency-help">
-                Format: <code>AdBhCmDs</code> (e.g., 1d = 1 day, 2h30m = 2 hours 30 minutes, 45s = 45 seconds)
-            </div>
-            <div id="frequencyError" class="frequency-error"></div>
+        <div class="controls">
+            <button id="settingsBtn" class="settings-btn">⚙️ Settings</button>
+            <button id="startBtn">Start Screen Capture</button>
+            <button id="stopBtn" style="display: none; background: #dc3545;">Stop Capture</button>
         </div>
-
-        <button id="startBtn">Start Screen Capture</button>
-        <button id="stopBtn" style="display: none; background: #dc3545;">Stop Capture</button>
 
         <div id="status" class="status"></div>
 
@@ -43,11 +32,64 @@
         </div>
     </div>
 
-    <div id="modal" class="modal">
-        <span class="modal-close" id="modalClose">&times;</span>
+    <div id="imageModal" class="modal">
+        <span class="modal-close" id="imageModalClose">&times;</span>
         <img id="modalImg" class="modal-content" alt="Full size screenshot">
     </div>
 
-    <script src="app.js"></script>
+    <div id="settingsModal" class="modal settings-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <span class="modal-close" id="settingsModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="frequency-control">
+                    <label for="frequencyInput">Capture Frequency:</label>
+                    <input
+                        type="text"
+                        id="frequencyInput"
+                        placeholder="e.g., 1m, 30s, 1h30m, 2d12h"
+                        value="1m"
+                    >
+                    <div class="frequency-help">
+                        Format: <code>AdBhCmDs</code> (e.g., 1d = 1 day, 2h30m = 2 hours 30 minutes, 45s = 45 seconds)
+                    </div>
+                    <div id="frequencyError" class="frequency-error"></div>
+                </div>
+
+                <div class="directory-control">
+                    <label for="directoryBtn">Save Location:</label>
+                    <button id="directoryBtn" class="directory-btn" type="button">Select Directory</button>
+                    <div id="directoryPath" class="directory-path">No directory selected</div>
+                    <div class="directory-help">
+                        Choose a folder where screenshots will be saved automatically
+                    </div>
+                </div>
+
+                <div class="llm-control">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="enableLLM" checked>
+                        <span>Enable AI Analysis</span>
+                    </label>
+                    <div class="llm-help">
+                        When enabled, each captured screenshot will be analyzed by the AI model
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSettingsBtn" class="save-settings-btn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "llm.js": "https://esm.sh/@themaximalist/llm.js@1.0.1?target=node"
+        }
+    }
+    </script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

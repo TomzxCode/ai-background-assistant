@@ -45,7 +45,15 @@ button {
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    width: 100%;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+}
+
+.controls button {
+    flex: 1;
 }
 
 button:hover {
@@ -220,7 +228,7 @@ button:disabled {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.7);
     justify-content: center;
     align-items: center;
 }
@@ -242,6 +250,70 @@ button:disabled {
     font-size: 40px;
     font-weight: bold;
     cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #ccc;
+}
+
+.settings-modal .modal-dialog {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.settings-modal .modal-header {
+    position: relative;
+    padding: 20px 30px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.settings-modal .modal-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 24px;
+}
+
+.settings-modal .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #666;
+    font-size: 30px;
+}
+
+.settings-modal .modal-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.settings-modal .modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.save-settings-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    padding: 12px 30px;
+    font-size: 14px;
+}
+
+.save-settings-btn:hover {
+    box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+}
+
+.settings-btn {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
 }
 
 .frequency-control {
@@ -311,4 +383,96 @@ button:disabled {
 
 .frequency-error.visible {
     display: block;
+}
+
+.directory-control {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.directory-control label {
+    display: block;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.directory-btn {
+    width: auto;
+    padding: 10px 20px;
+    font-size: 14px;
+    background: #28a745;
+    margin-bottom: 8px;
+}
+
+.directory-btn:hover {
+    box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+}
+
+.directory-path {
+    padding: 8px 12px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #666;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
+.directory-path.selected {
+    color: #28a745;
+    border-color: #28a745;
+    font-weight: 600;
+}
+
+.directory-help {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.llm-control {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.checkbox-label span {
+    color: #333;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.llm-help {
+    margin-top: 8px;
+    margin-left: 30px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
 }

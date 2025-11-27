@@ -25,11 +25,20 @@ const previewImg = document.getElementById('previewImg');
 const historyGrid = document.getElementById('historyGrid');
 const historyCount = document.getElementById('historyCount');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-const modal = document.getElementById('modal');
+const imageModal = document.getElementById('imageModal');
 const modalImg = document.getElementById('modalImg');
-const modalClose = document.getElementById('modalClose');
+const imageModalClose = document.getElementById('imageModalClose');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const settingsModalClose = document.getElementById('settingsModalClose');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const frequencyInput = document.getElementById('frequencyInput');
 const frequencyError = document.getElementById('frequencyError');
+const directoryBtn = document.getElementById('directoryBtn');
+const directoryPath = document.getElementById('directoryPath');
+const enableLLMCheckbox = document.getElementById('enableLLM');
+
+let directoryHandle = null;
 
 function updateStatus(message, isError = false) {
     status.textContent = message;
@@ -40,6 +49,73 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+async function selectDirectory() {
+    try {
+        // Check if File System Access API is supported
+        if (!('showDirectoryPicker' in window)) {
+            alert('Your browser does not support the File System Access API. Please use Chrome, Edge, or another Chromium-based browser.');
+            return;
+        }
+
+        directoryHandle = await window.showDirectoryPicker({
+            mode: 'readwrite'
+        });
+
+        // Update UI to show selected directory
+        directoryPath.textContent = directoryHandle.name;
+        directoryPath.className = 'directory-path selected';
+
+        updateStatus('Directory selected: ' + directoryHandle.name);
+        setTimeout(() => {
+            status.className = 'status';
+        }, 3000);
+
+    } catch (error) {
+        if (error.name !== 'AbortError') {
+            console.error('Error selecting directory:', error);
+            updateStatus('Error selecting directory: ' + error.message, true);
+        }
+    }
+}
+
+async function saveScreenshotToDisk(imageData, timestamp, analysis) {
+    if (!directoryHandle) {
+        console.log('No directory selected, skipping disk save');
+        return;
+    }
+
+    try {
+        // Create filename with timestamp
+        const filename = `screenshot_${timestamp.getFullYear()}${String(timestamp.getMonth() + 1).padStart(2, '0')}${String(timestamp.getDate()).padStart(2, '0')}_${String(timestamp.getHours()).padStart(2, '0')}${String(timestamp.getMinutes()).padStart(2, '0')}${String(timestamp.getSeconds()).padStart(2, '0')}.png`;
+
+        // Convert base64 to blob
+        const base64Data = imageData.split(',')[1];
+        const binaryData = atob(base64Data);
+        const bytes = new Uint8Array(binaryData.length);
+        for (let i = 0; i < binaryData.length; i++) {
+            bytes[i] = binaryData.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'image/png' });
+
+        // Create file handle and write
+        const fileHandle = await directoryHandle.getFileHandle(filename, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+
+        // Save analysis to text file
+        const analysisFilename = `screenshot_${timestamp.getFullYear()}${String(timestamp.getMonth() + 1).padStart(2, '0')}${String(timestamp.getDate()).padStart(2, '0')}_${String(timestamp.getHours()).padStart(2, '0')}${String(timestamp.getMinutes()).padStart(2, '0')}${String(timestamp.getSeconds()).padStart(2, '0')}_analysis.txt`;
+        const analysisFileHandle = await directoryHandle.getFileHandle(analysisFilename, { create: true });
+        const analysisWritable = await analysisFileHandle.createWritable();
+        await analysisWritable.write(analysis);
+        await analysisWritable.close();
+
+        console.log('Screenshot and analysis saved to disk:', filename);
+    } catch (error) {
+        console.error('Error saving screenshot to disk:', error);
+    }
 }
 
 function parseFrequency(input) {
@@ -138,7 +214,9 @@ async function startCapture() {
         // Update UI
         startBtn.style.display = 'none';
         stopBtn.style.display = 'block';
+        settingsBtn.disabled = true;
         frequencyInput.disabled = true;
+        enableLLMCheckbox.disabled = true;
         updateStatus(`Screen capture active. Capturing every ${frequencyText}...`);
 
         // Capture first frame after video is ready
@@ -169,19 +247,24 @@ async function captureFrame() {
     // Convert to image
     const imageData = canvas.toDataURL('image/png');
 
-    // Analyze with LLM
-    let llmResponse = 'Analyzing...';
-    try {
-        const image = LLM.Attachment.fromImageURL(imageData);
-        const response = await LLM(analysisPrompt, {
-            ...llmOptions,
-            attachments: [image],
-        });
-        llmResponse = response.content;
-        console.log('LLM Analysis:', response);
-    } catch (error) {
-        console.error('Error analyzing screenshot with LLM:', error);
-        llmResponse = `Error: ${error.message}`;
+    // Analyze with LLM if enabled
+    let llmResponse = null;
+    if (enableLLMCheckbox.checked) {
+        llmResponse = 'Analyzing...';
+        try {
+            const image = LLM.Attachment.fromImageURL(imageData);
+            const response = await LLM(analysisPrompt, {
+                ...llmOptions,
+                attachments: [image],
+            });
+            llmResponse = response.content;
+            console.log('LLM Analysis:', response);
+        } catch (error) {
+            console.error('Error analyzing screenshot with LLM:', error);
+            llmResponse = `Error: ${error.message}`;
+        }
+    } else {
+        llmResponse = 'AI analysis disabled';
     }
 
     // Update preview
@@ -203,6 +286,9 @@ async function captureFrame() {
     }
 
     updateHistory();
+
+    // Save to disk if directory is configured
+    await saveScreenshotToDisk(imageData, timestamp, llmResponse);
 
     // Send to server or process locally
     console.log('Frame captured at:', timestamp.toISOString());
@@ -244,7 +330,7 @@ function updateHistory() {
     document.querySelectorAll('.history-item img').forEach(img => {
         img.addEventListener('click', (e) => {
             modalImg.src = e.target.src;
-            modal.className = 'modal visible';
+            imageModal.className = 'modal visible';
         });
     });
 }
@@ -286,7 +372,9 @@ function stopCapture() {
 
     startBtn.style.display = 'block';
     stopBtn.style.display = 'none';
+    settingsBtn.disabled = false;
     frequencyInput.disabled = false;
+    enableLLMCheckbox.disabled = false;
     updateStatus('Capture stopped.');
 
     setTimeout(() => {
@@ -294,17 +382,54 @@ function stopCapture() {
     }, 3000);
 }
 
+// Settings modal handlers
+settingsBtn.addEventListener('click', () => {
+    settingsModal.className = 'modal settings-modal visible';
+});
+
+settingsModalClose.addEventListener('click', () => {
+    settingsModal.className = 'modal settings-modal';
+    clearFrequencyError();
+});
+
+saveSettingsBtn.addEventListener('click', () => {
+    // Validate frequency before closing
+    const parsed = parseFrequency(frequencyInput.value);
+    if (!parsed.valid) {
+        showFrequencyError(parsed.error);
+        return;
+    }
+    clearFrequencyError();
+    settingsModal.className = 'modal settings-modal';
+    updateStatus('Settings saved successfully.');
+    setTimeout(() => {
+        status.className = 'status';
+    }, 3000);
+});
+
+settingsModal.addEventListener('click', (e) => {
+    if (e.target === settingsModal) {
+        settingsModal.className = 'modal settings-modal';
+        clearFrequencyError();
+    }
+});
+
+// Image modal handlers
+imageModalClose.addEventListener('click', () => {
+    imageModal.className = 'modal';
+});
+
+imageModal.addEventListener('click', (e) => {
+    if (e.target === imageModal) {
+        imageModal.className = 'modal';
+    }
+});
+
+// Control handlers
 startBtn.addEventListener('click', startCapture);
 stopBtn.addEventListener('click', stopCapture);
 clearHistoryBtn.addEventListener('click', clearAllHistory);
-modalClose.addEventListener('click', () => {
-    modal.className = 'modal';
-});
-modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        modal.className = 'modal';
-    }
-});
+directoryBtn.addEventListener('click', selectDirectory);
 
 // Clear error when user types
 frequencyInput.addEventListener('input', () => {
