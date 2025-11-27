@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Background Assistant - Screen Capture</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Background Assistant</h1>
+        <p>Start screen capture to monitor your activity. Frames will be captured at your configured interval for AI analysis.</p>
+
+        <div class="frequency-control">
+            <label for="frequencyInput">Capture Frequency:</label>
+            <input
+                type="text"
+                id="frequencyInput"
+                placeholder="e.g., 1m, 30s, 1h30m, 2d12h"
+                value="1m"
+            >
+            <div class="frequency-help">
+                Format: <code>AdBhCmDs</code> (e.g., 1d = 1 day, 2h30m = 2 hours 30 minutes, 45s = 45 seconds)
+            </div>
+            <div id="frequencyError" class="frequency-error"></div>
+        </div>
+
+        <button id="startBtn">Start Screen Capture</button>
+        <button id="stopBtn" style="display: none; background: #dc3545;">Stop Capture</button>
+
+        <div id="status" class="status"></div>
+
+        <div id="preview" class="preview">
+            <img id="previewImg" alt="Latest capture">
+        </div>
+
+        <div class="history">
+            <h2>Screenshot History (<span id="historyCount">0</span>)</h2>
+            <div id="historyGrid" class="history-grid">
+                <div class="empty-history">No screenshots captured yet</div>
+            </div>
+            <button id="clearHistoryBtn" class="clear-history" style="display: none;">Clear All History</button>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <img id="modalImg" class="modal-content" alt="Full size screenshot">
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
