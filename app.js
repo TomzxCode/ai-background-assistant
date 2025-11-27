@@ -8,11 +8,11 @@ let ctx = null;
 let screenshotHistory = [];
 
 const llmOptions = {
-    service: "groq",
-    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    service: localStorage.getItem("LLM_SERVICE") || "groq",
+    model: localStorage.getItem("LLM_MODEL") || "meta-llama/llama-4-scout-17b-16e-instruct",
     extended: true,
     apiKey: localStorage.getItem("LLM_API_KEY") || "LLM_API_KEY_NOT_SET",
-    max_tokens: 8192,
+    max_tokens: parseInt(localStorage.getItem("LLM_MAX_TOKENS")) || 8192,
 };
 
 const startBtn = document.getElementById('startBtn');
@@ -37,6 +37,9 @@ const directoryPath = document.getElementById('directoryPath');
 const apiKeyInput = document.getElementById('apiKeyInput');
 const enableLLMCheckbox = document.getElementById('enableLLM');
 const promptInput = document.getElementById('promptInput');
+const llmServiceInput = document.getElementById('llmServiceInput');
+const llmModelInput = document.getElementById('llmModelInput');
+const maxTokensInput = document.getElementById('maxTokensInput');
 
 let directoryHandle = null;
 
@@ -56,6 +59,21 @@ function loadSettings() {
     if (savedApiKey) {
         apiKeyInput.value = savedApiKey;
     }
+
+    const savedService = localStorage.getItem('LLM_SERVICE');
+    if (savedService) {
+        llmServiceInput.value = savedService;
+    }
+
+    const savedModel = localStorage.getItem('LLM_MODEL');
+    if (savedModel) {
+        llmModelInput.value = savedModel;
+    }
+
+    const savedMaxTokens = localStorage.getItem('LLM_MAX_TOKENS');
+    if (savedMaxTokens) {
+        maxTokensInput.value = savedMaxTokens;
+    }
 }
 
 // Save settings to localStorage
@@ -67,6 +85,27 @@ function saveSettings() {
     if (apiKey) {
         localStorage.setItem('LLM_API_KEY', apiKey);
         llmOptions.apiKey = apiKey;
+    }
+
+    // Save LLM service and update llmOptions
+    const service = llmServiceInput.value.trim();
+    if (service) {
+        localStorage.setItem('LLM_SERVICE', service);
+        llmOptions.service = service;
+    }
+
+    // Save LLM model and update llmOptions
+    const model = llmModelInput.value.trim();
+    if (model) {
+        localStorage.setItem('LLM_MODEL', model);
+        llmOptions.model = model;
+    }
+
+    // Save max tokens and update llmOptions
+    const maxTokens = parseInt(maxTokensInput.value);
+    if (maxTokens && maxTokens > 0) {
+        localStorage.setItem('LLM_MAX_TOKENS', maxTokens.toString());
+        llmOptions.max_tokens = maxTokens;
     }
 }
 

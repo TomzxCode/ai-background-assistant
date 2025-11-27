@@ -67,6 +67,44 @@
                     </div>
                 </div>
 
+                <div class="llm-control">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="enableLLM" checked>
+                        <span>Enable AI Analysis</span>
+                    </label>
+                    <div class="llm-help">
+                        When enabled, each captured screenshot will be analyzed by the AI model
+                    </div>
+                </div>
+
+                <div class="llm-service-control">
+                    <label for="llmServiceInput">LLM Service:</label>
+                    <select id="llmServiceInput">
+                        <option value="groq">Groq</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="anthropic">Anthropic</option>
+                        <option value="google">Google</option>
+                        <option value="together">Together AI</option>
+                        <option value="ollama">Ollama (Local)</option>
+                    </select>
+                    <div class="llm-service-help">
+                        Select the LLM service provider to use for analysis
+                    </div>
+                </div>
+
+                <div class="llm-model-control">
+                    <label for="llmModelInput">LLM Model:</label>
+                    <input
+                        type="text"
+                        id="llmModelInput"
+                        placeholder="e.g., meta-llama/llama-4-scout-17b-16e-instruct"
+                        value="meta-llama/llama-4-scout-17b-16e-instruct"
+                    >
+                    <div class="llm-model-help">
+                        Specify the model to use (e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-2.0-flash-exp)
+                    </div>
+                </div>
+
                 <div class="api-key-control">
                     <label for="apiKeyInput">LLM API Key:</label>
                     <input
@@ -79,13 +117,18 @@
                     </div>
                 </div>
 
-                <div class="llm-control">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="enableLLM" checked>
-                        <span>Enable AI Analysis</span>
-                    </label>
-                    <div class="llm-help">
-                        When enabled, each captured screenshot will be analyzed by the AI model
+                <div class="max-tokens-control">
+                    <label for="maxTokensInput">Max Tokens:</label>
+                    <input
+                        type="number"
+                        id="maxTokensInput"
+                        placeholder="e.g., 8192"
+                        value="8192"
+                        min="1"
+                        max="1000000000"
+                    >
+                    <div class="max-tokens-help">
+                        Maximum number of tokens for the AI response (1-1000000000)
                     </div>
                 </div>
 
