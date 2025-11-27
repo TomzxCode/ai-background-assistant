@@ -15,8 +15,6 @@ const llmOptions = {
     max_tokens: 8192,
 };
 
-const analysisPrompt = "Analyze this screenshot and describe what you see. Focus on the main activities and any notable elements.";
-
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
 const status = document.getElementById('status');
@@ -37,8 +35,27 @@ const frequencyError = document.getElementById('frequencyError');
 const directoryBtn = document.getElementById('directoryBtn');
 const directoryPath = document.getElementById('directoryPath');
 const enableLLMCheckbox = document.getElementById('enableLLM');
+const promptInput = document.getElementById('promptInput');
 
 let directoryHandle = null;
+
+// Load saved prompt from localStorage or use default
+function getAnalysisPrompt() {
+    return promptInput.value || "Analyze this screenshot and describe what you see. Focus on the main activities and any notable elements.";
+}
+
+// Load settings from localStorage on page load
+function loadSettings() {
+    const savedPrompt = localStorage.getItem('analysisPrompt');
+    if (savedPrompt) {
+        promptInput.value = savedPrompt;
+    }
+}
+
+// Save settings to localStorage
+function saveSettings() {
+    localStorage.setItem('analysisPrompt', promptInput.value);
+}
 
 function updateStatus(message, isError = false) {
     status.textContent = message;
@@ -253,7 +270,8 @@ async function captureFrame() {
         llmResponse = 'Analyzing...';
         try {
             const image = LLM.Attachment.fromImageURL(imageData);
-            const response = await LLM(analysisPrompt, {
+            const prompt = getAnalysisPrompt();
+            const response = await LLM(prompt, {
                 ...llmOptions,
                 attachments: [image],
             });
@@ -400,6 +418,10 @@ saveSettingsBtn.addEventListener('click', () => {
         return;
     }
     clearFrequencyError();
+
+    // Save settings to localStorage
+    saveSettings();
+
     settingsModal.className = 'modal settings-modal';
     updateStatus('Settings saved successfully.');
     setTimeout(() => {
@@ -443,6 +465,11 @@ frequencyInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !frequencyInput.disabled) {
         startCapture();
     }
+});
+
+// Load settings on page load
+window.addEventListener('load', () => {
+    loadSettings();
 });
 
 // Load history on page load (if you want to persist using localStorage)
