@@ -19,7 +19,7 @@ body {
     border-radius: 12px;
     padding: 40px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    max-width: 600px;
+    max-width: 900px;
     width: 100%;
 }
 
@@ -111,10 +111,10 @@ button:disabled {
 }
 
 .history-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 15px;
-    max-height: 400px;
+    max-height: 600px;
     overflow-y: auto;
     padding: 10px;
     background: #f5f5f5;
@@ -123,20 +123,29 @@ button:disabled {
 
 .history-item {
     position: relative;
+    display: flex;
+    gap: 15px;
+    background: white;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.2s;
+    transition: box-shadow 0.2s;
 }
 
 .history-item:hover {
-    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.screenshot-container {
+    position: relative;
+    flex-shrink: 0;
+    width: 250px;
+    cursor: pointer;
 }
 
 .history-item img {
     width: 100%;
-    height: 100px;
+    height: 150px;
     object-fit: cover;
     display: block;
 }
@@ -151,6 +160,21 @@ button:disabled {
     font-size: 10px;
     padding: 5px;
     text-align: center;
+}
+
+.analysis-container {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.analysis-text {
+    color: #333;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-y: auto;
+    max-height: 150px;
 }
 
 .history-item .delete-btn {

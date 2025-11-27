@@ -1,9 +1,21 @@
+import LLM from 'llm.js';
+
 let stream = null;
 let captureInterval = null;
 let video = null;
 let canvas = null;
 let ctx = null;
 let screenshotHistory = [];
+
+const llmOptions = {
+    service: "groq",
+    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    extended: true,
+    apiKey: localStorage.getItem("LLM_API_KEY") || "LLM_API_KEY_NOT_SET",
+    max_tokens: 8192,
+};
+
+const analysisPrompt = "Analyze this screenshot and describe what you see. Focus on the main activities and any notable elements.";
 
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
@@ -22,6 +34,12 @@ const frequencyError = document.getElementById('frequencyError');
 function updateStatus(message, isError = false) {
     status.textContent = message;
     status.className = 'status ' + (isError ? 'error' : 'active');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function parseFrequency(input) {
@@ -141,7 +159,7 @@ async function startCapture() {
     }
 }
 
-function captureFrame() {
+async function captureFrame() {
     if (!video || !canvas || !ctx) return;
 
     canvas.width = video.videoWidth;
@@ -150,6 +168,21 @@ function captureFrame() {
 
     // Convert to image
     const imageData = canvas.toDataURL('image/png');
+
+    // Analyze with LLM
+    let llmResponse = 'Analyzing...';
+    try {
+        const image = LLM.Attachment.fromImageURL(imageData);
+        const response = await LLM(analysisPrompt, {
+            ...llmOptions,
+            attachments: [image],
+        });
+        llmResponse = response.content;
+        console.log('LLM Analysis:', response);
+    } catch (error) {
+        console.error('Error analyzing screenshot with LLM:', error);
+        llmResponse = `Error: ${error.message}`;
+    }
 
     // Update preview
     previewImg.src = imageData;
@@ -160,7 +193,8 @@ function captureFrame() {
     screenshotHistory.unshift({
         id: Date.now(),
         image: imageData,
-        timestamp: timestamp
+        timestamp: timestamp,
+        analysis: llmResponse
     });
 
     // Limit history to 50 items to prevent memory issues
@@ -195,8 +229,13 @@ function updateHistory() {
 
     historyGrid.innerHTML = screenshotHistory.map(item => `
         <div class="history-item" data-id="${item.id}">
-            <img src="${item.image}" alt="Screenshot">
-            <div class="timestamp">${formatTimestamp(item.timestamp)}</div>
+            <div class="screenshot-container">
+                <img src="${item.image}" alt="Screenshot">
+                <div class="timestamp">${formatTimestamp(item.timestamp)}</div>
+            </div>
+            <div class="analysis-container">
+                <div class="analysis-text">${escapeHtml(item.analysis || 'No analysis available')}</div>
+            </div>
             <button class="delete-btn" onclick="deleteScreenshot(${item.id})" title="Delete">×</button>
         </div>
     `).join('');
