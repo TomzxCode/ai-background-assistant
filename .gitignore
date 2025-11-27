@@ -38,4 +38,5 @@ Thumbs.db
 .env
 .env.local
 
+.cache
 site

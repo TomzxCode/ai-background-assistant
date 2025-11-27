@@ -1,0 +1,13 @@
+[project]
+name = "ai-background-assistant"
+version = "0.1.0"
+description = "An AI assistant running in the background to help with various tasks."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material[imaging]>=9.4.0",
+]

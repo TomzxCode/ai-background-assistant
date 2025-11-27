@@ -362,14 +362,6 @@ async function captureFrame() {
 
     // Send to server or process locally
     console.log('Frame captured at:', timestamp.toISOString());
-
-    // TODO: Send imageData to your server/API for AI processing
-    // Example:
-    // fetch('/api/analyze', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ image: imageData })
-    // });
 }
 
 function updateHistory() {
