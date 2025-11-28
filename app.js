@@ -359,12 +359,13 @@ async function captureFrame() {
     // Convert to image
     const imageData = canvas.toDataURL('image/png');
 
+
     // Analyze with LLM if enabled
     let llmResponse = null;
     if (enableLLMCheckbox.checked) {
         llmResponse = 'Analyzing...';
         try {
-            const image = LLM.Attachment.fromImageURL(imageData);
+            const image = LLM.Attachment.fromPNG(imageData.slice(22)); // Strip "data:image/png;base64,"
             const prompt = getAnalysisPrompt();
             const response = await LLM(prompt, {
                 ...llmOptions,
