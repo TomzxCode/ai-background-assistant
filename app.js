@@ -1,5 +1,3 @@
-import LLM from 'llm.js';
-
 let stream = null;
 let captureInterval = null;
 let video = null;
@@ -7,12 +5,45 @@ let canvas = null;
 let ctx = null;
 let screenshotHistory = [];
 
+const applicationId = "ai-background-assistant";
+
+function getConfigurationValue(key, defaultValue) {
+    // Try to get configuration from applicationId key
+    try {
+        const appConfig = localStorage.getItem(applicationId);
+        if (appConfig) {
+            const config = JSON.parse(appConfig);
+            if (config && config.hasOwnProperty(key)) {
+                return config[key];
+            }
+        }
+    } catch (error) {
+        console.warn(`Error parsing ${applicationId} configuration:`, error);
+    }
+
+    // Fall back to llm-defaults key
+    try {
+        const defaultConfig = localStorage.getItem('llm-defaults');
+        if (defaultConfig) {
+            const config = JSON.parse(defaultConfig);
+            if (config && config.hasOwnProperty(key)) {
+                return config[key];
+            }
+        }
+    } catch (error) {
+        console.warn('Error parsing llm-defaults configuration:', error);
+    }
+
+    // Use provided default
+    return defaultValue;
+}
+
 const llmOptions = {
-    service: localStorage.getItem("LLM_SERVICE") || "groq",
-    model: localStorage.getItem("LLM_MODEL") || "meta-llama/llama-4-scout-17b-16e-instruct",
+    service: getConfigurationValue("service", "groq"),
+    model: getConfigurationValue("model", "meta-llama/llama-4-scout-17b-16e-instruct"),
     extended: true,
-    apiKey: localStorage.getItem("LLM_API_KEY") || "LLM_API_KEY_NOT_SET",
-    max_tokens: parseInt(localStorage.getItem("LLM_MAX_TOKENS")) || 8192,
+    apiKey: getConfigurationValue("api_key", "LLM_API_KEY_NOT_SET"),
+    max_tokens: parseInt(getConfigurationValue("max_tokens", "8192")),
 };
 
 const startBtn = document.getElementById('startBtn');
@@ -50,63 +81,75 @@ function getAnalysisPrompt() {
 
 // Load settings from localStorage on page load
 function loadSettings() {
-    const savedPrompt = localStorage.getItem('analysisPrompt');
+    // Load settings from applicationId dictionary
+    const savedPrompt = getConfigurationValue('analysisPrompt', '');
     if (savedPrompt) {
         promptInput.value = savedPrompt;
     }
 
-    const savedApiKey = localStorage.getItem('LLM_API_KEY');
-    if (savedApiKey) {
-        apiKeyInput.value = savedApiKey;
+    const apiKey = getConfigurationValue('api_key', '');
+    if (apiKey) {
+        apiKeyInput.value = apiKey;
     }
 
-    const savedService = localStorage.getItem('LLM_SERVICE');
-    if (savedService) {
-        llmServiceInput.value = savedService;
+    const service = getConfigurationValue('service', '');
+    if (service) {
+        llmServiceInput.value = service;
     }
 
-    const savedModel = localStorage.getItem('LLM_MODEL');
-    if (savedModel) {
-        llmModelInput.value = savedModel;
+    const model = getConfigurationValue('model', '');
+    if (model) {
+        llmModelInput.value = model;
     }
 
-    const savedMaxTokens = localStorage.getItem('LLM_MAX_TOKENS');
-    if (savedMaxTokens) {
-        maxTokensInput.value = savedMaxTokens;
+    const maxTokens = getConfigurationValue('max_tokens', '');
+    if (maxTokens) {
+        maxTokensInput.value = maxTokens;
     }
 }
 
 // Save settings to localStorage
 function saveSettings() {
-    localStorage.setItem('analysisPrompt', promptInput.value);
+    // Load existing configuration or create new one
+    let config = {};
+    try {
+        const existing = localStorage.getItem(applicationId);
+        if (existing) {
+            config = JSON.parse(existing);
+        }
+    } catch (error) {
+        console.warn('Error loading existing config:', error);
+    }
 
-    // Save API key and update llmOptions
+    // Update configuration values
+    config.analysisPrompt = promptInput.value;
+
     const apiKey = apiKeyInput.value.trim();
     if (apiKey) {
-        localStorage.setItem('LLM_API_KEY', apiKey);
+        config.api_key = apiKey;
         llmOptions.apiKey = apiKey;
     }
 
-    // Save LLM service and update llmOptions
     const service = llmServiceInput.value.trim();
     if (service) {
-        localStorage.setItem('LLM_SERVICE', service);
+        config.service = service;
         llmOptions.service = service;
     }
 
-    // Save LLM model and update llmOptions
     const model = llmModelInput.value.trim();
     if (model) {
-        localStorage.setItem('LLM_MODEL', model);
+        config.model = model;
         llmOptions.model = model;
     }
 
-    // Save max tokens and update llmOptions
     const maxTokens = parseInt(maxTokensInput.value);
     if (maxTokens && maxTokens > 0) {
-        localStorage.setItem('LLM_MAX_TOKENS', maxTokens.toString());
+        config.max_tokens = maxTokens;
         llmOptions.max_tokens = maxTokens;
     }
+
+    // Save updated configuration back to localStorage
+    localStorage.setItem(applicationId, JSON.stringify(config));
 }
 
 function updateStatus(message, isError = false) {
