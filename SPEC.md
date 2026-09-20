@@ -760,7 +760,7 @@ ai-background-assistant/
 ├── app.js              # Core application logic
 ├── styles.css          # Styling and layout
 ├── SPEC.md            # This specification
-├── CLAUDE.md          # Development guidelines
+├── AGENTS.md          # Development guidelines
 └── README.md          # Project overview
 ```
 

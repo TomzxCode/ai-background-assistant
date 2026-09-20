@@ -157,7 +157,7 @@ ai-background-assistant/
 ├── app.js                  # Screen capture, LLM integration, and event handlers
 ├── README.md               # This file
 ├── SPEC.md                 # Technical specifications
-└── CLAUDE.md               # Claude Code project guidance
+└── AGENTS.md               # Claude Code project guidance
 ```
 
 ## Known Limitations

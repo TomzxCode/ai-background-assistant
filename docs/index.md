@@ -189,7 +189,7 @@ ai-background-assistant/
 ├── app.js                  # Screen capture logic, LLM integration, event handlers
 ├── styles.css              # All styling and layout
 ├── README.md               # Project overview
-├── CLAUDE.md               # Developer guidance for Claude Code
+├── AGENTS.md               # Developer guidance for Claude Code
 ├── SPEC.md                 # Technical specifications
 └── docs/                   # Documentation
     └── index.md            # This file
@@ -270,7 +270,7 @@ ai-background-assistant/
 
 - [README.md](../README.md) - Project overview
 - [SPEC.md](../SPEC.md) - Technical specifications
-- [CLAUDE.md](../CLAUDE.md) - Developer guidance
+- [AGENTS.md](../AGENTS.md) - Developer guidance
 
 ## Contributing
 
